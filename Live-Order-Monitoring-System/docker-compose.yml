@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres_db
+    env_file:
+      - ./other-services/.env
+    ports:
+      - "15432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./other-services/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - order-network
+    restart: unless-stopped
+
+  # Redis - ใช้สำหรับ cache และ pub/sub
+  redis:
+    image: redis:7-alpine
+    container_name: redis_cache
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - order-network
+    restart: unless-stopped
+
+# Named volumes สำหรับ เก็บข้อมูลถาวรของแต่ละ service
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+# Network สำหรับให้ services คุยกันได้
+networks:
+  order-network:
+    driver: bridge
+    name: order-monitoring-network
