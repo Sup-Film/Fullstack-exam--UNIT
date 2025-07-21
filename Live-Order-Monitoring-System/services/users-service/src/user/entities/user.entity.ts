@@ -12,7 +12,7 @@ export enum UserRole {
   ADMIN = 'admin',
 }
 
-@Entity('user') // ชื่อของตารางในฐานข้อมูล
+@Entity('users') // ชื่อของตารางในฐานข้อมูล
 export class User {
   @PrimaryGeneratedColumn() // สร้าง Primary Key อัตโนมัติ
   id: number;
