@@ -1,10 +1,5 @@
 // src/auth/auth.service.ts
-import {
-  Injectable,
-  Logger,
-  UnauthorizedException,
-  ConflictException, // 👈 ใช้ Exception ที่สื่อความหมายได้ดีกว่า
-} from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { LoginResponseDto } from './dto/loginReponse.dto';
