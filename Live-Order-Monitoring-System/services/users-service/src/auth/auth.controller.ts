@@ -15,6 +15,9 @@ import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/user/dto/createUser.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { UserRole } from 'src/user/entities/user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -92,12 +95,22 @@ export class AuthController {
 
   @Get('profile')
   @UseGuards(JwtAuthGuard) // ใช้ Guard ที่เราสร้างขึ้น
-  async getProfile(@Request() req: any) {
+  getProfile(@Request() req: any) {
     // req.user จะมีข้อมูลผู้ใช้ที่ JwtStrategy ส่งมาให้
     return {
       success: true,
       message: 'ดึงข้อมูลโปรไฟล์สำเร็จ',
       data: req.user,
+    };
+  }
+
+  // กำหนด Route เฉพาะ Role admin
+  @Get('all')
+  @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  findAllUsers() {
+    return {
+      message: 'This route is protected and only accessible by admin users.',
     };
   }
 
