@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm/dist/common/typeorm.decorators';
 import { Repository } from 'typeorm';
@@ -20,7 +20,7 @@ export class UserService {
       where: { email },
     });
     if (existingUser) {
-      throw new Error('User already exists');
+      throw new ConflictException('User already exists');
     }
 
     // เข้ารหัสผ่านก่อนบันทึก
@@ -34,6 +34,10 @@ export class UserService {
     });
 
     return await this.usersRepository.save(user);
+  }
+
+  async findAll(): Promise<User[]> {
+    return await this.usersRepository.find();
   }
 
   // หาผู้ใช้จากอีเมล
