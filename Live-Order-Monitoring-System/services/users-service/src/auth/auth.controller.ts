@@ -67,6 +67,7 @@ export class AuthController {
     try {
       this.logger.log(`📝 Processing registration for: ${createUserDto.email}`);
 
+      // เรียกใช้ AuthService เพื่อสมัครสมาชิก
       const result = await this.authService.register(createUserDto);
 
       this.logger.log(`✅ Registration successful: ${createUserDto.email}`);
@@ -123,6 +124,7 @@ export class AuthController {
     try {
       this.logger.log('🔍 Processing external token verification...');
 
+      // เรียกใช้ AuthService เพื่อตรวจสอบ token
       const result = await this.authService.verifyToken(token);
 
       this.logger.log('✅ External token verification successful');

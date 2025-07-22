@@ -5,7 +5,7 @@ import { AuthService } from './auth/auth.service';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { User } from './user/entities/user.entity';
 
 @Module({
@@ -14,11 +14,22 @@ import { User } from './user/entities/user.entity';
       isGlobal: true, // ทำให้ทุก module เข้าถึง env variables ได้
       envFilePath: '.env', // path ไปยัง .env file
     }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      url: process.env.DATABASE_URL,
-      entities: [User],
-      synchronize: true, // สำหรับ development เท่านั้น
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        type: 'postgres',
+        url: configService.get('DATABASE_URL'),
+        entities: [User],
+        synchronize: configService.get('NODE_ENV') === 'development', // เฉพาะ dev เท่านั้น
+        logging: configService.get('NODE_ENV') === 'development',
+        // เพิ่ม connection pooling เพื่อป้องกันการเชื่อมต่อขาด
+        extra: {
+          max: 20,
+          connectionTimeoutMillis: 30000,
+          idleTimeoutMillis: 30000,
+        },
+      }),
+      inject: [ConfigService],
     }),
     AuthModule,
     UserModule,

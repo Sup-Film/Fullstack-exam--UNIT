@@ -5,6 +5,7 @@ import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
 
   // Enable CORS for all origins
   // กำหนดให้สามารถเข้าถึง API ได้จาก origin ที่ระบุในที่นี้คือ gateway
@@ -29,6 +30,8 @@ async function bootstrap() {
     }),
   );
 
-  await app.listen(process.env.PORT ?? 3000);
+  const port = configService.get('PORT') || 3002;
+
+  await app.listen(port, '0.0.0.0');
 }
 bootstrap();
