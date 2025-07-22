@@ -95,7 +95,7 @@ export class AuthController {
 
   @Get('profile')
   @UseGuards(JwtAuthGuard) // ใช้ Guard ที่เราสร้างขึ้น
-  getProfile(@Request() req: any) {
+  async getProfile(@Request() req: any) {
     // req.user จะมีข้อมูลผู้ใช้ที่ JwtStrategy ส่งมาให้
     return {
       success: true,
