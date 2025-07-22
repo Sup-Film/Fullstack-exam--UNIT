@@ -57,6 +57,9 @@ services:
       - orders_node_modules:/app/node_modules
     networks:
       - order-network
+    depends_on:
+      - postgres
+      - redis
     restart: unless-stopped
 
 

@@ -6,6 +6,7 @@ import { ProductsModule } from './products/products.module';
 import { Product } from './entities/product.entity';
 import { Order } from './entities/order.entity';
 import { OrderItem } from './entities/order-item.entity';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { OrderItem } from './entities/order-item.entity';
 
     // นำเข้า ProductsModule ที่เราสร้างไว้
     ProductsModule,
+    OrdersModule,
   ],
   controllers: [],
   providers: [],

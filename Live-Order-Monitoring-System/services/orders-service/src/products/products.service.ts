@@ -17,7 +17,7 @@ export class ProductsService {
   ) {}
 
   // CreateProduct
-  async createProduct(createProductDto: CreateProductDto): Promise<Product> {
+  async create(createProductDto: CreateProductDto): Promise<Product> {
     const existingProduct = await this.productsRepository.findOne({
       where: { name: createProductDto.name },
     });
