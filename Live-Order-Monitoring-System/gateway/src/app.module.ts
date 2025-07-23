@@ -5,6 +5,9 @@ import { AuthMiddleware } from './middleware/auth.middleware';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Request } from 'express';
 import { createProxyMiddleware } from 'http-proxy-middleware';
+import { EventsGateway } from './events/events.gateway';
+import { RedisModule } from './redis/redis.module';
+import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [
@@ -12,9 +15,11 @@ import { createProxyMiddleware } from 'http-proxy-middleware';
       isGlobal: true,
       envFilePath: '.env',
     }),
+    EventsModule,
+    RedisModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, EventsGateway],
 })
 
 // Implement NestModule เพื่อให้สามารถใช้ Middleware ได้
