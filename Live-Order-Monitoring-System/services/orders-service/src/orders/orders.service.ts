@@ -10,27 +10,28 @@ import { Order, OrderStatus } from '../entities/order.entity';
 import { Product } from '../entities/product.entity';
 import { ProductsService } from '../products/products.service';
 import { InjectRepository } from '@nestjs/typeorm';
+import { RedisService } from 'src/redis/redis.service';
 
 @Injectable()
 export class OrdersService {
   private readonly logger = new Logger(OrdersService.name);
 
   constructor(
-    // 1. Inject 'Order' Repository:
+    // Inject 'Order' Repository:
     //    เครื่องมือสำหรับจัดการข้อมูลในตาราง 'orders' โดยเฉพาะ
     @InjectRepository(Order)
     private ordersRepository: Repository<Order>,
 
-    // 2. Inject 'ProductsService':
+    // Inject 'ProductsService':
     //    เพื่อเรียกใช้งานฟังก์ชันต่างๆ จาก ProductsService เช่น การค้นหาสินค้า
     private productsService: ProductsService,
 
-    // 3. Inject 'DataSource':
+    // Inject 'DataSource':
     //    เครื่องมือหลักในการเชื่อมต่อกับ Database ใช้สำหรับทำ Transaction
     private dataSource: DataSource,
 
-    // 4. Inject 'RedisService'
-    // private redisService: RedisService,
+    // Inject 'RedisService'
+    private redisService: RedisService,
   ) {}
 
   /**
@@ -123,8 +124,8 @@ export class OrdersService {
       const savedOrder = await transactionalEntityManager.save(newOrder);
       this.logger.log(`✅ Order #${savedOrder.id} created successfully.`);
 
-      // ส่ง Event ไปยัง Redis (จะทำในขั้นตอนถัดไป)
-      // await this.redisService.publishOrderCreated(savedOrder);
+      // ส่ง Event ไปยัง Redis โดยส่งข้อมูลออเดอร์ที่ถูกสร้างขึ้นใหม่ไป
+      await this.redisService.publishOrderCreated(savedOrder);
 
       return savedOrder;
     });
@@ -196,6 +197,10 @@ export class OrdersService {
 
     order.status = status;
     const updatedOrder = await this.ordersRepository.save(order);
+
+    // ส่ง Event ไปยัง Redis เมื่อสถานะออเดอร์ถูกเปลี่ยน
+    await this.redisService.publishOrderStatusChanged(updatedOrder);
+
     return updatedOrder;
   }
 

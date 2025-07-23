@@ -7,6 +7,7 @@ import { Product } from './entities/product.entity';
 import { Order } from './entities/order.entity';
 import { OrderItem } from './entities/order-item.entity';
 import { OrdersModule } from './orders/orders.module';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { OrdersModule } from './orders/orders.module';
     }),
 
     // นำเข้า ProductsModule ที่เราสร้างไว้
+    RedisModule,
     ProductsModule,
     OrdersModule,
   ],
