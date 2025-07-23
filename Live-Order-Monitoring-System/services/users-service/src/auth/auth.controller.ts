@@ -13,6 +13,7 @@ import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/user/dto/createUser.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { LoginResponseDto } from './dto/loginReponse.dto';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -33,6 +34,7 @@ export class AuthController {
   }
 
   @Post('verify')
+  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   async verifyToken(@Body('token') token: string) {
     return this.authService.verifyToken(token);
