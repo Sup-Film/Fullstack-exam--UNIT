@@ -8,6 +8,7 @@ import {
   Request,
   HttpCode,
   HttpStatus,
+  Get,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/user/dto/createUser.dto';
@@ -33,10 +34,15 @@ export class AuthController {
     return this.authService.register(createUserDto);
   }
 
-  @Post('verify')
+  @Get('verify')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
-  async verifyToken(@Body('token') token: string) {
-    return this.authService.verifyToken(token);
+  async verifyToken(@Request() req) {
+    // JwtAuthGuard จะอ่าน token จาก Authorization Header อัตโนมัติ
+    // และแนบ user data เข้าใน req.user
+    return {
+      valid: true,
+      user: req.user, // user data ที่ได้จาก JWT Guard
+    };
   }
 }

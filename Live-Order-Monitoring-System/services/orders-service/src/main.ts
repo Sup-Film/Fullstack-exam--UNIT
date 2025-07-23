@@ -11,9 +11,6 @@ async function bootstrap() {
 
   const port = configService.get<number>('PORT', 3001);
 
-  // ตั้งค่าให้ API ทุกตัวขึ้นต้นด้วย /api
-  app.setGlobalPrefix('api');
-
   // เปิดใช้งาน Global ValidationPipe
   app.useGlobalPipes(
     new ValidationPipe({

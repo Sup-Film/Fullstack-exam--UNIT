@@ -13,7 +13,7 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       'http://localhost:3000', // Gateway URL
-      'http://gateway:3000', // Gateway URL ใน Docker network
+      'http://api_gateway:3000', // Gateway URL ใน Docker network
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],

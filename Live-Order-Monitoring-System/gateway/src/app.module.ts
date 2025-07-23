@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthMiddleware } from './middleware/auth.middleware';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { Request } from 'express';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 
 @Module({
@@ -27,28 +28,55 @@ export class AppModule implements NestModule {
     const ordersServiceUrl =
       this.configService.get<string>('ORDERS_SERVICE_URL');
 
-    // สร้าง Proxy สำหรับ Users Service
+    const commonProxyOptions = {
+      changeOrigin: true,
+      on: {
+        proxyReq: (proxyReq, req: Request, res) => {
+          if (req.body && Object.keys(req.body).length > 0) {
+            const bodyData = JSON.stringify(req.body);
+            proxyReq.setHeader('Content-Type', 'application/json');
+            proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
+            proxyReq.write(bodyData);
+          }
+        },
+      },
+    };
+
+    // Proxy สำหรับ Users และ Auth Service
     consumer
       .apply(
         createProxyMiddleware({
+          ...commonProxyOptions,
           target: usersServiceUrl,
-          changeOrigin: true,
           pathRewrite: {
-            '^/users': '', // ลบ /users ที่นำหน้า path ทั้งหมดออก
+            '^/users/auth': '/auth',
+            '^/users': '/users',
           },
         }),
       )
-      .forRoutes('users'); // ทุก path ที่ขึ้นต้นด้วย /users
+      .forRoutes('users');
 
-    // สร้าง Proxy สำหรับ Orders Service
+    // Proxy สำหรับ Products Service
     consumer
       .apply(
         createProxyMiddleware({
+          ...commonProxyOptions,
           target: ordersServiceUrl,
-          changeOrigin: true,
+          pathRewrite: { '^/products': '/products' },
         }),
       )
-      .forRoutes('orders'); // ทุก path ที่ขึ้นต้นด้วย /orders
+      .forRoutes('products');
+
+    // Proxy สำหรับ Orders Service
+    consumer
+      .apply(
+        createProxyMiddleware({
+          ...commonProxyOptions,
+          target: ordersServiceUrl,
+          pathRewrite: { '^/orders': '/orders' },
+        }),
+      )
+      .forRoutes('orders');
 
     // ---- Auth Middleware ----
     // AuthMiddleware จะทำงาน ก่อน Proxy Middleware เสมอ
