@@ -11,7 +11,7 @@ import axios from 'axios';
 export class AuthMiddleware implements NestMiddleware {
   private readonly logger = new Logger(AuthMiddleware.name);
   // ประกาศ url สำหรับตรวจสอบ token
-  private readonly usersServiceUrl = 'http://users-service:3002/auth/verify';
+  private readonly usersServiceUrl = 'http://users-service:3002/api/auth/verify';
 
   async use(req: Request, res: Response, next: NextFunction) {
     // ประกาศตัวแปรสำหรับเก็บค่า token จาก header

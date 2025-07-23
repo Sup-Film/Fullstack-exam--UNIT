@@ -42,6 +42,13 @@ export class AppModule implements NestModule {
       },
     };
 
+    // ---- Auth Middleware ----
+    // AuthMiddleware จะทำงาน ก่อน Proxy Middleware เสมอ
+    consumer.apply(AuthMiddleware).forRoutes(
+      'orders', // ทุกอย่างใน /orders ต้องเช็ค Token
+      'users/profile', // เฉพาะ /users/profile ที่ต้องเช็ค Token
+    );
+
     // Proxy สำหรับ Users และ Auth Service
     consumer
       .apply(
@@ -49,8 +56,7 @@ export class AppModule implements NestModule {
           ...commonProxyOptions,
           target: usersServiceUrl,
           pathRewrite: {
-            '^/users/auth': '/auth',
-            '^/users': '/users',
+            '^/users/auth': 'api/auth',
           },
         }),
       )
@@ -62,7 +68,6 @@ export class AppModule implements NestModule {
         createProxyMiddleware({
           ...commonProxyOptions,
           target: ordersServiceUrl,
-          pathRewrite: { '^/products': '/products' },
         }),
       )
       .forRoutes('products');
@@ -73,17 +78,8 @@ export class AppModule implements NestModule {
         createProxyMiddleware({
           ...commonProxyOptions,
           target: ordersServiceUrl,
-          pathRewrite: { '^/orders': '/orders' },
         }),
       )
       .forRoutes('orders');
-
-    // ---- Auth Middleware ----
-    // AuthMiddleware จะทำงาน ก่อน Proxy Middleware เสมอ
-    consumer.apply(AuthMiddleware).forRoutes(
-      'orders', // ทุกอย่างใน /orders ต้องเช็ค Token
-      'users/profile', // เฉพาะ /users/profile ที่ต้องเช็ค Token
-      // ส่วน /users (สำหรับ register) และ /auth/login จะไม่ถูกเช็ค
-    );
   }
 }

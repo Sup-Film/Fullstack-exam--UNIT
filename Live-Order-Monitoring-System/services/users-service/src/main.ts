@@ -8,6 +8,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
 
+  app.setGlobalPrefix('api');
+
   // Enable CORS for all origins
   // กำหนดให้สามารถเข้าถึง API ได้จาก origin ที่ระบุในที่นี้คือ gateway
   app.enableCors({
