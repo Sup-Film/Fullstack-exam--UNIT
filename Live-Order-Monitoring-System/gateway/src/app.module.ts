@@ -27,22 +27,15 @@ export class AppModule implements NestModule {
     const ordersServiceUrl =
       this.configService.get<string>('ORDERS_SERVICE_URL');
 
-    // สร้าง Proxy สำหรับ Auth Service
-    consumer
-      .apply(
-        createProxyMiddleware({
-          target: usersServiceUrl,
-          changeOrigin: true,
-        }),
-      )
-      .forRoutes('auth'); // ทุก path ที่ขึ้นต้นด้วย /auth
-
     // สร้าง Proxy สำหรับ Users Service
     consumer
       .apply(
         createProxyMiddleware({
           target: usersServiceUrl,
           changeOrigin: true,
+          pathRewrite: {
+            '^/users': '', // ลบ /users ที่นำหน้า path ทั้งหมดออก
+          },
         }),
       )
       .forRoutes('users'); // ทุก path ที่ขึ้นต้นด้วย /users

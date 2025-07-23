@@ -5,11 +5,11 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from './entities/user.entity';
 
-@Controller('user')
+@Controller()
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  // GET /user/profile
+  // GET /profile
   @Get('profile')
   @UseGuards(JwtAuthGuard) // ป้องกันด้วย JWT Guard
   async getProfile(@Request() req: any) {
@@ -20,7 +20,7 @@ export class UserController {
     };
   }
 
-  // GET /user/all
+  // GET /all
   @Get('all')
   @Roles(UserRole.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
