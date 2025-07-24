@@ -2,7 +2,7 @@
 
 import { useSocket } from "@/hooks/useSocket";
 import api from "@/lib/api";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 
 // กำหนดข้อมูล OrderItem
@@ -90,6 +90,22 @@ export default function Home() {
     };
   }, [socket, queryClient]); // useEffect จะทำงานใหม่เมื่อ socket หรือ queryClient เปลี่ยนไป
 
+  const { mutate: updateOrderStatus, isPending } = useMutation({
+    mutationFn: ({ orderId, status }: { orderId: number; status: string }) => {
+      // ยิง API PATCH ไปที่ Gateway
+      return api.patch(`/orders/api/orders/${orderId}/status`, { status });
+    },
+    onSuccess: () => {
+      // เราไม่จำเป็นต้องทำอะไรที่นี่ เพราะเมื่อ API สำเร็จ
+      // Backend จะส่ง Event ผ่าน WebSocket มาอัปเดตหน้าจอให้เราเอง
+      console.log("Update successful, waiting for WebSocket event...");
+    },
+    onError: (err) => {
+      console.error("Failed to update status:", err);
+      alert("Failed to update order status!");
+    },
+  });
+
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -141,6 +157,9 @@ export default function Home() {
                 <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
                   Time
                 </th>
+                <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white">
@@ -171,6 +190,34 @@ export default function Home() {
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-right text-sm text-gray-500">
                     {new Date(order.createdAt).toLocaleTimeString()}
+                  </td>
+                  <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+                    {order.status === "pending" && (
+                      <div className="flex justify-end space-x-2">
+                        <button
+                          onClick={() =>
+                            updateOrderStatus({
+                              orderId: order.id,
+                              status: "confirmed",
+                            })
+                          }
+                          disabled={isPending}
+                          className="rounded-md bg-blue-600 px-3 py-1 text-white shadow-sm hover:bg-blue-700 disabled:opacity-50">
+                          Confirm
+                        </button>
+                        <button
+                          onClick={() =>
+                            updateOrderStatus({
+                              orderId: order.id,
+                              status: "cancelled",
+                            })
+                          }
+                          disabled={isPending}
+                          className="rounded-md bg-red-600 px-3 py-1 text-white shadow-sm hover:bg-red-700 disabled:opacity-50">
+                          Cancel
+                        </button>
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))}
