@@ -11,6 +11,10 @@ import {
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { UseGuards } from '@nestjs/common';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { UserFromHeaderGuard } from 'src/auth/guards/user-from-header.guard';
 
 @Controller('orders')
 export class OrdersController {
@@ -49,6 +53,8 @@ export class OrdersController {
    * PATCH /api/orders/:id/status
    */
   @Patch(':id/status')
+  @Roles('admin', 'staff') // กำหนดให้เฉพาะแอดมินเท่านั้นที่สามารถเข้าถึงได้
+  @UseGuards(UserFromHeaderGuard, RolesGuard)
   updateStatus(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateOrderDto: UpdateOrderDto,

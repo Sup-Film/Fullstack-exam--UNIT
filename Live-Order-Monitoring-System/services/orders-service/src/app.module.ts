@@ -10,6 +10,7 @@ import { OrdersModule } from './orders/orders.module';
 import { RedisModule } from './redis/redis.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { AppService } from './app.service';
     }),
 
     // นำเข้า ProductsModule ที่เราสร้างไว้
+    AuthModule,
     RedisModule,
     ProductsModule,
     OrdersModule,
