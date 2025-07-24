@@ -3,6 +3,7 @@
 import { useSocket } from "@/hooks/useSocket";
 import api from "@/lib/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 // กำหนดข้อมูล OrderItem
@@ -26,6 +27,7 @@ interface Order {
 }
 
 export default function Home() {
+  const router = useRouter();
   const queryClient = useQueryClient();
   const socket = useSocket(
     process.env.NEXT_PUBLIC_SOCKET_URL || "ws://localhost:3000"
@@ -35,6 +37,7 @@ export default function Home() {
   const {
     data: orders,
     isLoading,
+    isError,
     error,
   } = useQuery<Order[]>({
     queryKey: ["orders"], // ตั้งชื่อ Key สำหรับ Cache ของข้อมูลนี้
@@ -44,8 +47,19 @@ export default function Home() {
       console.log("Fetched orders:", data);
       return data;
     },
+    retry: 1, // พยายามเชื่อมต่อแค่ 1 ครั้งถ้าล้มเหลว
     refetchOnWindowFocus: false, // ปิดการ refetch อัตโนมัติเมื่อกลับมาที่หน้าต่าง
   });
+
+  // ถ้าเกิดข้อผิดพลาดในการดึงข้อมูล หรือ 401 Unauthorized
+  useEffect(() => {
+    // ถ้า isError เป็น true แสดงว่าการดึงข้อมูลล้มเหลว
+    if (isError) {
+      console.error("Failed to fetch orders, redirecting to login.", error);
+      // สั่งให้ไปที่หน้า Login
+      router.push("/login");
+    }
+  }, [isError, router, error]);
 
   // จัดการ Real-time Events ด้วย useEffect
   useEffect(() => {
@@ -106,10 +120,26 @@ export default function Home() {
     },
   });
 
+  const { mutate: logout, isPending: isLoggingOut } = useMutation({
+    mutationFn: () => {
+      // ยิง API POST ไปที่ Gateway เพื่อ Logout
+      return api.post("/users/api/auth/logout");
+    },
+    onSuccess: () => {
+      // เมื่อ Logout สำเร็จ ให้ล้าง Cache ของ React Query ทั้งหมด
+      queryClient.clear();
+      router.push("/login");
+    },
+    onError: (err) => {
+      queryClient.clear();
+      router.push("/login");
+    },
+  });
+
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
-        Loading...
+        Authenticating & Loading...
       </div>
     );
   }
@@ -136,6 +166,18 @@ export default function Home() {
               }`}></span>
             <span>{socket?.connected ? "Connected" : "Disconnected"}</span>
           </div>
+        </div>
+        {/* Logout Button - styled and positioned top right */}
+        <div className="absolute right-8 top-8 z-10">
+          <button
+            onClick={() => logout()}
+            disabled={isLoggingOut}
+            className="flex items-center gap-2 rounded-full bg-gradient-to-r from-red-500 to-pink-500 px-5 py-2 text-base font-semibold text-white shadow-lg hover:from-red-600 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 disabled:opacity-50 transition-all duration-150">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="h-5 w-5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1" />
+            </svg>
+            Logout
+          </button>
         </div>
 
         <div className="overflow-hidden rounded-lg bg-white shadow">

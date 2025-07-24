@@ -18,6 +18,7 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 import { LoginResponseDto } from './dto/loginReponse.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { LoginCookieResponseDto } from './dto/loginCookieResponse.dto';
+import { RegisterResponseDto } from './dto/regusterReponse.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -46,10 +47,24 @@ export class AuthController {
     return { user: loginData.user };
   }
 
+  @Post('logout')
+  @HttpCode(HttpStatus.OK)
+  logout(@Res({ passthrough: true }) res: Response) {
+    // res.clearCookie จะเป็นการตั้งค่าให้ Cookie หมดอายุทันที
+    res.clearCookie('access_token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+    });
+    return { message: 'Logout successful' };
+  }
+
   @Post('register')
+  @HttpCode(HttpStatus.CREATED)
   async register(
     @Body() createUserDto: CreateUserDto,
-  ): Promise<LoginResponseDto> {
+  ): Promise<RegisterResponseDto> {
     return this.authService.register(createUserDto);
   }
 

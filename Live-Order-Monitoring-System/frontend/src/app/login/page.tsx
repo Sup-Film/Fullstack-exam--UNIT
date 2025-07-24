@@ -2,6 +2,7 @@
 
 import api from "@/lib/api";
 import { AxiosError } from "axios";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, FormEvent } from "react";
 
@@ -96,6 +97,12 @@ const LoginPage = () => {
             Login
           </button>
         </form>
+        <div className="mt-4 text-center text-sm">
+          ยังไม่มีบัญชีใช่ไหม?{" "}
+          <Link href="/register" className="text-blue-600 hover:underline">
+            ลงทะเบียน
+          </Link>
+        </div>
       </div>
     </main>
   );

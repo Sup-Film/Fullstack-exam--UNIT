@@ -5,6 +5,7 @@ import { UserService } from '../user/user.service';
 import { LoginResponseDto } from './dto/loginReponse.dto';
 import { CreateUserDto } from '../user/dto/createUser.dto';
 import { User } from '../user/entities/user.entity';
+import { RegisterResponseDto } from './dto/regusterReponse.dto';
 
 @Injectable()
 export class AuthService {
@@ -57,11 +58,13 @@ export class AuthService {
    * Registers a new user and logs them in.
    * @throws {ConflictException} If the email already exists.
    */
-  async register(createUserDto: CreateUserDto): Promise<LoginResponseDto> {
+  async register(createUserDto: CreateUserDto): Promise<RegisterResponseDto> {
     try {
       const newUser = await this.userService.create(createUserDto);
       this.logger.log(`New user registered: ${newUser.email}`);
-      return this.login(newUser);
+      return {
+        user: newUser.toResponseObject(),
+      };
     } catch (error) {
       this.logger.error(
         `Registration failed for ${createUserDto.email}`,
