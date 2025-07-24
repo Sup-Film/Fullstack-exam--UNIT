@@ -44,3 +44,100 @@ CREATE TABLE order_items (
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
 );
+
+-- Sample Users
+INSERT INTO
+    users (
+        email,
+        password,
+        name,
+        role,
+        created_at
+    )
+VALUES (
+        'admin@example.com',
+        'password123',
+        'Admin User',
+        'admin',
+        NOW()
+    ),
+    (
+        'staff@example.com',
+        'password123',
+        'Staff User',
+        'staff',
+        NOW()
+    ),
+    (
+        'customer@example.com',
+        'password123',
+        'Customer User',
+        'customer',
+        NOW()
+    );
+
+-- Sample Products
+INSERT INTO
+    products (
+        name,
+        description,
+        price,
+        stock,
+        created_at,
+        updated_at
+    )
+VALUES (
+        'Coffee',
+        'Freshly brewed coffee',
+        50.00,
+        100,
+        NOW(),
+        NOW()
+    ),
+    (
+        'Sandwich',
+        'Ham & cheese sandwich',
+        80.00,
+        50,
+        NOW(),
+        NOW()
+    ),
+    (
+        'Cake',
+        'Chocolate cake slice',
+        60.00,
+        30,
+        NOW(),
+        NOW()
+    );
+
+-- Sample Orders
+INSERT INTO
+    orders (
+        customer_id,
+        total_amount,
+        status,
+        created_at,
+        updated_at
+    )
+VALUES (
+        3,
+        110.00,
+        'pending',
+        NOW(),
+        NOW()
+    ), -- customer@example.com
+
+-- Sample Order Items
+INSERT INTO
+    order_items (
+        order_id,
+        product_id,
+        quantity,
+        price,
+        created_at,
+        updated_at
+    )
+VALUES (1, 1, 1, 50.00, NOW(), NOW()), -- Coffee
+    (1, 2, 1, 60.00, NOW(), NOW());
+-- Cake

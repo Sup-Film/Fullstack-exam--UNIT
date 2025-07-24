@@ -4,44 +4,7 @@ A real-time order monitoring dashboard built with microservices architecture,
 featuring live WebSocket updates for tracking orders instantly.
 
 ## 🏗️ Architecture Overview
-
-```mermaid
-graph TB
-    subgraph "Frontend"
-        FE[Next.js Dashboard<br/>Port: 3003]
-    end
-
-    subgraph "API Gateway"
-        GW[NestJS Gateway<br/>Port: 3000<br/>• HTTP Proxy<br/>• WebSocket Hub<br/>• Auth Middleware]
-    end
-
-    subgraph "Microservices"
-        US[Users Service<br/>Port: 3002<br/>• Authentication<br/>• User Management<br/>• JWT Generation]
-        OS[Orders Service<br/>Port: 3001<br/>• Order CRUD<br/>• Business Logic<br/>• Event Publishing]
-    end
-
-    subgraph "Databases"
-        PG[(PostgreSQL<br/>Port: 15432<br/>• Users Data<br/>• Orders Data)]
-        RD[(Redis<br/>Port: 6379<br/>• Pub/Sub Events<br/>• Session Cache)]
-    end
-
-    FE -.->|WebSocket| GW
-    FE -->|HTTP API| GW
-    GW -->|Proxy /users/*| US
-    GW -->|Proxy /orders/*| OS
-    GW <-.->|Subscribe Events| RD
-
-    US --> PG
-    OS --> PG
-    OS -.->|Publish Events| RD
-
-    style FE fill:#e1f5fe
-    style GW fill:#f3e5f5
-    style US fill:#e8f5e8
-    style OS fill:#fff3e0
-    style PG fill:#fce4ec
-    style RD fill:#ffebee
-```
+![System Architecture](./SystemArchitecture.png)
 
 ## 🚀 Quick Start
 
