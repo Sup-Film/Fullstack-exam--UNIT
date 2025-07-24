@@ -1,0 +1,678 @@
+{
+  "info": {
+    "name": "Live Order Monitoring System",
+    "description": "Complete API collection for Live Order Monitoring System with real-time WebSocket capabilities",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Auto-login if token is missing or expired",
+          "if (!pm.environment.get('access_token') || pm.environment.get('token_expires') < Date.now()) {",
+          "    console.log('Token missing or expired, performing auto-login...');",
+          "    ",
+          "    const loginRequest = {",
+          "        url: pm.environment.get('base_url') + '/users/api/auth/login',",
+          "        method: 'POST',",
+          "        header: {",
+          "            'Content-Type': 'application/json'",
+          "        },",
+          "        body: {",
+          "            mode: 'raw',",
+          "            raw: JSON.stringify({",
+          "                email: pm.environment.get('admin_email'),",
+          "                password: pm.environment.get('admin_password')",
+          "            })",
+          "        }",
+          "    };",
+          "    ",
+          "    pm.sendRequest(loginRequest, (err, res) => {",
+          "        if (err) {",
+          "            console.log('Auto-login failed:', err);",
+          "        } else if (res.code === 200 || res.code === 201) {",
+          "            const jsonData = res.json();",
+          "            pm.environment.set('access_token', jsonData.access_token);",
+          "            pm.environment.set('token_expires', Date.now() + 3600000); // 1 hour",
+          "            console.log('Auto-login successful');",
+          "        } else {",
+          "            console.log('Auto-login failed with status:', res.code);",
+          "        }",
+          "    });",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "🔐 Authentication",
+      "item": [
+        {
+          "name": "Login Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Login successful', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.environment.set('access_token', jsonData.access_token);",
+                  "    pm.environment.set('current_user', JSON.stringify(jsonData.user));",
+                  "    pm.environment.set('token_expires', Date.now() + 3600000);",
+                  "    console.log('Login successful for:', jsonData.user.email);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/api/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Login as admin user to get access token"
+          }
+        },
+        {
+          "name": "Login Staff",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Staff login successful', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.environment.set('staff_token', jsonData.access_token);",
+                  "    pm.environment.set('staff_user', JSON.stringify(jsonData.user));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"staff@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/api/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Register New User",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"password123\",\n  \"name\": \"New User\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/api/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "api",
+                "auth",
+                "register"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Verify Token",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/api/auth/verify",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "api",
+                "auth",
+                "verify"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/api/users/profile",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "api",
+                "users",
+                "profile"
+              ]
+            }
+          }
+        }
+      ],
+      "description": "Authentication endpoints for login, register, and token verification"
+    },
+    {
+      "name": "📦 Orders Management",
+      "item": [
+        {
+          "name": "Get All Orders",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Get orders successful', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is array', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});",
+                  "",
+                  "if (pm.response.json().length > 0) {",
+                  "    const firstOrder = pm.response.json()[0];",
+                  "    pm.environment.set('sample_order_id', firstOrder.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/orders/api/orders",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders",
+                "api",
+                "orders"
+              ]
+            },
+            "description": "Retrieve all orders with order items and products"
+          }
+        },
+        {
+          "name": "Get Order by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/orders/api/orders/{{sample_order_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders",
+                "api",
+                "orders",
+                "{{sample_order_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create New Order",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Order created successfully', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.environment.set('new_order_id', jsonData.id);",
+                  "    console.log('New order created with ID:', jsonData.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": 1,\n      \"quantity\": 2\n    },\n    {\n      \"productId\": 2,\n      \"quantity\": 1\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/orders/api/orders",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders",
+                "api",
+                "orders"
+              ]
+            },
+            "description": "Create a new order with multiple items"
+          }
+        },
+        {
+          "name": "Update Order Status - Confirm",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"confirmed\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/orders/api/orders/{{new_order_id}}/status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders",
+                "api",
+                "orders",
+                "{{new_order_id}}",
+                "status"
+              ]
+            },
+            "description": "Update order status to confirmed (Admin only)"
+          }
+        },
+        {
+          "name": "Update Order Status - Preparing",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"preparing\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/orders/api/orders/{{new_order_id}}/status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders",
+                "api",
+                "orders",
+                "{{new_order_id}}",
+                "status"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Order Status - Shipped",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"shipped\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/orders/api/orders/{{new_order_id}}/status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders",
+                "api",
+                "orders",
+                "{{new_order_id}}",
+                "status"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Order Status - Delivered",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"delivered\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/orders/api/orders/{{new_order_id}}/status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders",
+                "api",
+                "orders",
+                "{{new_order_id}}",
+                "status"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Cancel Order",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"cancelled\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/orders/api/orders/{{sample_order_id}}/status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders",
+                "api",
+                "orders",
+                "{{sample_order_id}}",
+                "status"
+              ]
+            }
+          }
+        }
+      ],
+      "description": "Order management endpoints for CRUD operations and status updates"
+    },
+    {
+      "name": "🛍️ Products Management",
+      "item": [
+        {
+          "name": "Get All Products",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Get products successful', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "if (pm.response.json().length > 0) {",
+                  "    const firstProduct = pm.response.json()[0];",
+                  "    pm.environment.set('sample_product_id', firstProduct.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/products/api/products",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "api",
+                "products"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Product by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/products/api/products/{{sample_product_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "api",
+                "products",
+                "{{sample_product_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create New Product",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.environment.set('new_product_id', jsonData.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Product\",\n  \"description\": \"A test product for API testing\",\n  \"price\": 29.99,\n  \"stock\": 100\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/products/api/products",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "api",
+                "products"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Product",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Test Product\",\n  \"price\": 39.99,\n  \"stock\": 150\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/products/api/products/{{new_product_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "api",
+                "products",
+                "{{new_product_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Product",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/products/api/products/{{new_product_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "api",
+                "products",
+                "{{new_product_id}}"
+              ]
+            }
+          }
+        }
+      ],
+      "description": "Product management endpoints for inventory control"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global pre-request script for all endpoints",
+          "console.log('Making request to:', pm.request.url.toString());"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global test script for all endpoints",
+          "pm.test('Response time is reasonable', function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+          "});",
+          "",
+          "pm.test('No server errors', function () {",
+          "    pm.response.to.not.have.status(500);",
+          "});"
+        ]
+      }
+    }
+  ]
+}

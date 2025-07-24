@@ -4,7 +4,7 @@ A real-time order monitoring dashboard built with microservices architecture,
 featuring live WebSocket updates for tracking orders instantly.
 
 ## 🏗️ Architecture Overview
-![System Architecture](./SystemArchitecture.png)
+![System Architecture](/Live-Order-Monitoring-System/docs/SystemArchitecture.png)
 
 ## 🚀 Quick Start
 
