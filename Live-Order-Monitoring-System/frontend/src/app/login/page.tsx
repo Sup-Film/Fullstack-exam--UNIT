@@ -26,10 +26,8 @@ const LoginPage = () => {
         password,
       });
 
-      // ถ้า Login สำเร็จ ให้เก็บ Token
-      if (response.data.access_token) {
-        localStorage.setItem("token", response.data.access_token);
-        // ปลี่ยนหน้าไปที่หน้า Dashboard
+      // ถ้าสำเร็จจะได้รับ status 200 OK หรือ 201 Created
+      if (response.status === 201 || response.status === 200) {
         router.push("/");
       }
     } catch (error: unknown) {

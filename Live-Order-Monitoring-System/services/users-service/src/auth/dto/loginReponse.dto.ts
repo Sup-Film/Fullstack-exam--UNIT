@@ -5,5 +5,6 @@ export interface LoginResponseDto {
     email: string;
     name: string;
     role: string;
+    created_at: Date;
   };
 }

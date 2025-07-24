@@ -66,7 +66,7 @@ export class OrdersService {
     return this.dataSource.transaction(async (transactionalEntityManager) => {
       let totalAmount = 0;
       const orderItemsData: {
-        productId: number;
+        product: Product;
         quantity: number;
         price: number;
       }[] = [];
@@ -106,7 +106,7 @@ export class OrdersService {
 
         // เตรียมข้อมูลสำหรับสร้าง OrderItem
         orderItemsData.push({
-          productId: product.id,
+          product,
           quantity: itemDto.quantity,
           price: product.price, // บันทึกราคา ณ วันที่สั่งซื้อ
         });

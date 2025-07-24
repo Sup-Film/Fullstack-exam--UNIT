@@ -15,7 +15,8 @@ import { Server, Socket } from 'socket.io';
 // เราเพิ่ม cors เข้าไปเพื่อให้ Frontend จาก URL อื่นเชื่อมต่อได้
 @WebSocketGateway({
   cors: {
-    origin: '*', // ใน Production ควรระบุ URL ของ Frontend ให้ชัดเจน
+    origin: 'http://localhost:3003', // URL ของ Frontend
+    credentials: true, // อนุญาตให้ส่ง cookies และ headers อื่นๆ
   },
 })
 export class EventsGateway

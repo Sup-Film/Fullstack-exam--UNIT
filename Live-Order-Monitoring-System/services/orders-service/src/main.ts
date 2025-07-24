@@ -23,7 +23,14 @@ async function bootstrap() {
   );
 
   // เปิดใช้งาน CORS
-  app.enableCors();
+  app.enableCors({
+    origin: [
+      'http://localhost:3003', // URL ของ Frontend
+      'http://localhost:3000',
+    ], // URL ของ Frontend
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true, // อนุญาตให้ส่ง cookies และ headers อื่นๆ
+  });
 
   await app.listen(port, '0.0.0.0');
 
