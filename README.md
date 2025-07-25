@@ -206,19 +206,6 @@ npm install
 npm run dev
 ```
 
-### Build for Production
-
-```bash
-# Build all services
-docker-compose -f docker-compose.prod.yml up --build
-
-# Or build individual services
-cd services/users-service && npm run build
-cd services/orders-service && npm run build
-cd gateway && npm run build
-cd frontend && npm run build
-```
-
 ## 📚 API Documentation
 
 ### Postman Collection
@@ -226,7 +213,6 @@ cd frontend && npm run build
 Import the Postman collection for testing APIs:
 
 - **File**: `docs/Live-Order-Monitoring.postman_collection.json`
-- **Environment**: `docs/Local-Development.postman_environment.json`
 
 ### Testing Order Creation Flow:
 
@@ -289,18 +275,6 @@ docker-compose restart gateway
 | `api_gateway`    | 3000  | `curl /`         |
 | `frontend_app`   | 3003  | `curl /`         |
 
-## 🚀 Deployment
-
-### Local Production
-
-```bash
-# Production build
-docker-compose -f docker-compose.prod.yml up -d
-
-# Scale services
-docker-compose up -d --scale orders-service=3
-```
-
 ### Environment Variables
 
 Essential configuration in `.env` files:
@@ -315,16 +289,5 @@ Essential configuration in `.env` files:
 MIT License - see LICENSE file for details.
 
 ---
-
-## 🎯 Features Showcase
-
-✅ **Real-time Updates** - WebSocket streaming  
-✅ **Microservices** - Modular architecture  
-✅ **Authentication** - JWT + Role-based access  
-✅ **Database Relations** - Normalized PostgreSQL schema  
-✅ **Event-Driven** - Redis pub/sub communication  
-✅ **Docker Compose** - Complete containerization  
-✅ **Type Safety** - Full TypeScript implementation  
-✅ **Responsive UI** - Works on all devices
 
 **Built with ❤️ for real-time order monitoring**
