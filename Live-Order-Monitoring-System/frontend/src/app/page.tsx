@@ -4,7 +4,7 @@ import { useSocket } from "@/hooks/useSocket";
 import api from "@/lib/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 // กำหนดข้อมูล OrderItem
 interface OrderItem {
@@ -136,6 +136,14 @@ export default function Home() {
     },
   });
 
+  // Filter orders
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+
+  const filterOrders =
+    orders?.filter((order) => {
+      return statusFilter === "all" || order.status === statusFilter;
+    }) || [];
+
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -173,11 +181,41 @@ export default function Home() {
             onClick={() => logout()}
             disabled={isLoggingOut}
             className="flex items-center gap-2 rounded-full bg-gradient-to-r from-red-500 to-pink-500 px-5 py-2 text-base font-semibold text-white shadow-lg hover:from-red-600 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 disabled:opacity-50 transition-all duration-150">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="h-5 w-5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+              className="h-5 w-5">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1"
+              />
             </svg>
             Logout
           </button>
+        </div>
+
+        <div className="mb-4 flex space-x-2">
+          <label htmlFor="statusFilter" className="sr-only">
+            Filter by status
+          </label>
+          <select
+            id="statusFilter"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="rounded-full border border-gray-300 bg-white px-4 py-2 text-gray-700 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-all duration-150"
+          >
+            <option value="all">All Statuses</option>
+            <option value="pending">Pending</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="preparing">Preparing</option>
+            <option value="shipped">Shipped</option>
+            <option value="delivered">Delivered</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
         </div>
 
         <div className="overflow-hidden rounded-lg bg-white shadow">
@@ -205,7 +243,7 @@ export default function Home() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white">
-              {orders?.map((order) => (
+              {filterOrders?.map((order) => (
                 <tr key={order.id} className="hover:bg-gray-50">
                   <td className="whitespace-nowrap px-6 py-4 font-medium text-gray-900">
                     #{order.id}
