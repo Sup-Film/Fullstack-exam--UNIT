@@ -47,40 +47,65 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center">สมัครสมาชิก</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="text"
-            placeholder="ชื่อ"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full px-4 py-2 border rounded"
-            required
-          />
-          <input
-            type="email"
-            placeholder="อีเมล"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-2 border rounded"
-            required
-          />
-          <input
-            type="password"
-            placeholder="รหัสผ่าน"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-2 border rounded"
-            required
-          />
+    <main className="flex min-h-screen flex-col items-center justify-center bg-gray-100 p-24">
+      <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg">
+        <h1 className="mb-6 text-center text-3xl font-bold text-gray-800">
+          สมัครสมาชิก
+        </h1>
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label htmlFor="name" className="mb-2 block text-sm font-medium text-gray-700">
+              ชื่อ
+            </label>
+            <input
+              type="text"
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              className="block w-full rounded-md border-gray-300 p-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              placeholder="ชื่อ"
+            />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="email" className="mb-2 block text-sm font-medium text-gray-700">
+              อีเมล
+            </label>
+            <input
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="block w-full rounded-md border-gray-300 p-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              placeholder="admin@example.com"
+            />
+          </div>
+          <div className="mb-6">
+            <label htmlFor="password" className="mb-2 block text-sm font-medium text-gray-700">
+              รหัสผ่าน
+            </label>
+            <input
+              type="password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="block w-full rounded-md border-gray-300 p-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              placeholder="••••••••"
+            />
+          </div>
+
+          {/* แสดงข้อความ Error ถ้ามี */}
           {error && (
-            <div className="text-red-500 text-sm text-center">{error}</div>
+            <p className="mb-4 rounded-md bg-red-100 p-3 text-center text-sm text-red-600">
+              {error}
+            </p>
           )}
+
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">
+            className="w-full rounded-lg bg-indigo-600 px-4 py-3 text-base font-semibold text-white shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
             สมัครสมาชิก
           </button>
         </form>
@@ -91,7 +116,7 @@ const RegisterPage = () => {
           </Link>
         </div>
       </div>
-    </div>
+    </main>
   );
 };
 export default RegisterPage;
